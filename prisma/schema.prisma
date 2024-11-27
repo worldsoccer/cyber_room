@@ -1,0 +1,202 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String    @id @default(cuid())
+  name                   String?
+  email                  String?   @unique
+  emailVerified          DateTime?
+  image                  String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  accounts               Account[]
+  sessions               Session[]
+  stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
+  stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
+  stripePriceId          String?   @map(name: "stripe_price_id")
+  stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
+
+  badges       Badge[]       @relation("UserBadges")
+  achievements Achievement[]
+  reminders    Reminder[]
+  progress     Progress[]
+  rankings     Ranking[]
+  folders      Folder[]      @relation("UserFolders") // フォルダ作成リレーション
+  answers      Answer[] // Answerとのリレーション
+
+  @@map(name: "users")
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
+  createdAt         DateTime @default(now()) @map(name: "created_at")
+  updatedAt         DateTime @default(now()) @map(name: "updated_at")
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map(name: "accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  expires      DateTime
+  sessionToken String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map(name: "sessions")
+}
+
+model VerificationRequest {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map(name: "verification_tokens")
+}
+
+model Folder {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  files     File[]
+  author    User     @relation(fields: [authorId], references: [id], name: "UserFolders")
+  authorId  String // Userモデルのidフィールドに合わせてString型に修正
+}
+
+model File {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  folder    Folder   @relation(fields: [folderId], references: [id])
+  folderId  Int
+  quizzes   Quiz[]
+  authorId  String? // 一時的にオプションに変更
+}
+
+model Quiz {
+  id            Int        @id @default(autoincrement())
+  title         String
+  description   String?
+  createdAt     DateTime   @default(now())
+  file          File?      @relation(fields: [fileId], references: [id])
+  fileId        Int?
+  timeLimit     Int?
+  difficulty    Int        @default(1)
+  questions     Question[]
+  rankings      Ranking[]
+  feedbacks     Feedback[] @relation("QuizFeedback") // クイズ全体のフィードバックとのリレーション
+  progresses    Progress[] // Progressとの逆方向リレーションを追加
+  imagePath     String?
+  generatedByAI Boolean    @default(false)
+}
+
+model Question {
+  id         Int       @id @default(autoincrement())
+  text       String // 質問文
+  quiz       Quiz      @relation(fields: [quizId], references: [id])
+  quizId     Int // 親クイズのID
+  difficulty Int // 難易度
+  options    Option[] // 選択肢
+  imagePath  String? // 画像 (オプション)
+  feedback   Feedback? @relation("QuestionFeedback") // 解説とのリレーション
+  answers    Answer[] // 回答とのリレーション
+}
+
+model Option {
+  id         Int      @id @default(autoincrement())
+  text       String
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId Int // Questionとの一対多の関係（@uniqueは不要）
+  isCorrect  Boolean // 正解かどうかを示すフラグ
+  answers    Answer[] // Answerモデルとの逆リレーション
+}
+
+model Answer {
+  id               Int      @id @default(autoincrement())
+  user             User     @relation(fields: [userId], references: [id])
+  userId           String // Userモデルのidフィールドに合わせてString型に修正
+  question         Question @relation(fields: [questionId], references: [id]) // 質問とのリレーション
+  questionId       Int
+  selectedOption   Option   @relation(fields: [selectedOptionId], references: [id]) // 選択肢とのリレーション
+  selectedOptionId Int
+  isCorrect        Boolean // 正解かどうか
+  answeredAt       DateTime @default(now())
+}
+
+model Badge {
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  criteria String // 取得条件（例：正答率90%以上など）
+  users    User[] @relation("UserBadges")
+}
+
+model Achievement {
+  id       Int    @id @default(autoincrement())
+  title    String
+  criteria String // 取得条件（例：全クイズ正解など）
+  users    User[]
+}
+
+model Reminder {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String // Userモデルのidフィールドに合わせてString型に修正
+  frequency String // リマインダーの頻度（例："daily", "weekly"）
+  nextDate  DateTime // 次のリマインド日時
+}
+
+model Progress {
+  id             Int      @id @default(autoincrement())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String
+  quiz           Quiz     @relation(fields: [quizId], references: [id]) // Quizとのリレーション
+  quizId         Int
+  score          Int?
+  difficulty     Int
+  completionTime Int
+  lastAccess     DateTime @default(now())
+}
+
+model Ranking {
+  id       Int      @id @default(autoincrement())
+  quiz     Quiz     @relation(fields: [quizId], references: [id])
+  quizId   Int
+  user     User     @relation(fields: [userId], references: [id])
+  userId   String // Userモデルのidフィールドに合わせてString型に修正
+  score    Int
+  rankDate DateTime @default(now())
+}
+
+model Feedback {
+  id         Int       @id @default(autoincrement())
+  text       String // 解説内容
+  question   Question? @relation(fields: [questionId], references: [id], name: "QuestionFeedback")
+  questionId Int?      @unique // 質問ごとの解説は一意
+  quiz       Quiz?     @relation(fields: [quizId], references: [id], name: "QuizFeedback")
+  quizId     Int? // クイズ全体に対する解説も許可
+}
