@@ -42,22 +42,31 @@ export default function NewQuiz({ fileId }: NewQuizProps) {
 
   const parseQuizInput = (input: string): ParsedQuestion[] => {
     const questions = input
-      .split(/問題\d+:/)
-      .filter(Boolean)
+      .split(/問題\d+:/) // 各問題を分割
+      .filter(Boolean) // 空の要素を除外
       .map((block, index): ParsedQuestion => {
         try {
-          const questionMatch = block.match(/^(.*?)(?=\d+\.\s|正解:)/s);
-          const optionsMatch = block.match(
-            /(\d+\.\s.*?)(?=(\d+\.\s|正解:|$))/gs
-          );
+          // 質問の抽出
+          const questionMatch = block.match(/^(.*?)(\n|$)/);
+          const question = questionMatch ? questionMatch[1].trim() : "";
+
+          // 選択肢の抽出 (空行を無視)
+          const lines = block.split("\n").map((line) => line.trim()); // 各行をトリム
+          const options = lines
+            .slice(1) // 最初の行 (質問) を除外
+            .filter(
+              (line) =>
+                line && // 空行を無視
+                !line.startsWith("正解:") &&
+                !line.startsWith("難易度:") &&
+                !line.startsWith("解説:")
+            );
+
+          // 正解、難易度、解説の抽出
           const correctAnswerMatch = block.match(/正解:\s*(\d+)/);
           const difficultyMatch = block.match(/難易度:\s*(\d+)/);
           const explanationMatch = block.match(/解説:\s*(.*)/s);
 
-          const question = questionMatch ? questionMatch[1].trim() : "";
-          const options = optionsMatch
-            ? optionsMatch.map((opt) => opt.replace(/^\d+\.\s*/, "").trim())
-            : [];
           const correctAnswer = correctAnswerMatch
             ? parseInt(correctAnswerMatch[1], 10)
             : -1;
@@ -68,11 +77,12 @@ export default function NewQuiz({ fileId }: NewQuizProps) {
             ? explanationMatch[1].trim()
             : null;
 
+          // バリデーション
           if (
-            !question ||
-            options.length < 4 ||
-            correctAnswer < 1 ||
-            difficulty < 1
+            !question || // 質問が空の場合
+            options.length < 4 || // 選択肢が4つ未満の場合
+            correctAnswer < 1 || // 正解が不正
+            difficulty < 1 // 難易度が不正
           ) {
             throw new Error(`質問 ${index + 1} のフォーマットが不正です。`);
           }
