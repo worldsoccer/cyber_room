@@ -244,9 +244,7 @@ const GameTestPage = ({ params }: { params: Promise<{ fileId: string }> }) => {
           <p className="text-gray-700">{currentQuestion.feedback.text}</p>
           {currentQuizImagePath && (
             <Image
-              src={
-                "https://nzmqqrivmefdpxpqunoq.supabase.co/storage/v1/object/public/public-img-bucket/uploads/1732627031658_image.png"
-              }
+              src={currentQuizImagePath}
               alt="クイズ画像"
               width={500}
               height={300}

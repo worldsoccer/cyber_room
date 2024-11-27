@@ -1,9 +1,23 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  eactStrictMode: true,
+  reactStrictMode: true,
   images: {
-    domains: ["nzmqqrivmefdpxpqunoq.supabase.co"], // Supabase のドメインを追加
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com", // Googleのプロフィール画像
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com", // GitHubのプロフィール画像
+      },
+      {
+        protocol: "https",
+        hostname: "nzmqqrivmefdpxpqunoq.supabase.co", // Supabaseの画像
+        pathname: "/storage/v1/object/public/public-img-bucket/uploads/**", // パス指定で制限を細かく設定
+      },
+    ],
   },
 };
 
