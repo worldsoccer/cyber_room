@@ -73,14 +73,22 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(filer);
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(err.issues, { status: 422 });
     }
 
-    console.error("Unexpected Error:", err);
+    if (err instanceof Error) {
+      console.error("Unexpected Error:", err.message);
+      return NextResponse.json(
+        { message: "ファイル作成中に予期しないエラーが発生しました" },
+        { status: 500 }
+      );
+    }
+
+    console.error("Unknown Error:", err);
     return NextResponse.json(
-      { message: "ファイル作成中に予期しないエラーが発生しました" },
+      { message: "予期しないエラーが発生しました" },
       { status: 500 }
     );
   }

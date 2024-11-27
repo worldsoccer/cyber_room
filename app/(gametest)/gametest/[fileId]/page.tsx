@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -56,7 +57,7 @@ const GameTestPage = ({ params }: { params: Promise<{ fileId: string }> }) => {
   const [error, setError] = useState<string | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [results, setResults] = useState<Result[]>([]);
-  const [hasExplained, setHasExplained] = useState(false);
+  const [, setHasExplained] = useState(false);
   const [answered, setAnswered] = useState(false); // 回答済みかどうか
   const router = useRouter();
 
@@ -69,8 +70,12 @@ const GameTestPage = ({ params }: { params: Promise<{ fileId: string }> }) => {
           throw new Error("無効なファイル ID です。");
         }
         setFileId(id);
-      } catch (err: any) {
-        setError(err.message || "ファイル ID の取得に失敗しました。");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message || "エラーが発生しました。");
+        } else {
+          setError("予期しないエラーが発生しました。");
+        }
       }
     };
     resolveParams();
@@ -97,8 +102,12 @@ const GameTestPage = ({ params }: { params: Promise<{ fileId: string }> }) => {
         if (allQuestions.length > 0) {
           setShuffledOptions(shuffleArray(allQuestions[0].options));
         }
-      } catch (err: any) {
-        setError(err.message || "クイズデータの取得中にエラーが発生しました。");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message || "エラーが発生しました。");
+        } else {
+          setError("予期しないエラーが発生しました。");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -115,7 +124,7 @@ const GameTestPage = ({ params }: { params: Promise<{ fileId: string }> }) => {
     if (questions[currentQuestionIndex]) {
       setShuffledOptions(shuffleArray(questions[currentQuestionIndex].options));
     }
-  }, [currentQuestionIndex]);
+  }, [currentQuestionIndex, questions]);
 
   const currentQuestion = questions[currentQuestionIndex];
   const currentQuizImagePath = fileQuizzes.find((quiz) =>
@@ -234,9 +243,11 @@ const GameTestPage = ({ params }: { params: Promise<{ fileId: string }> }) => {
         <div className="mt-6">
           <p className="text-gray-700">{currentQuestion.feedback.text}</p>
           {currentQuizImagePath && (
-            <img
-              src={currentQuizImagePath}
+            <Image
+              src={currentQuizImagePath || "/default-placeholder.png"}
               alt="クイズ画像"
+              width={500}
+              height={300}
               className="mt-4 rounded shadow"
             />
           )}

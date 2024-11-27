@@ -8,13 +8,10 @@ import QuizSection from "./quiz/quiz-section";
 
 interface DashBoardContentProps {
   folderWithQuizzes: FolderWithQuizzes[]; // フォルダ情報の配列
-  className?: string; // オプションの追加スタイル
 }
 
 export default function DashBoardContent({
   folderWithQuizzes,
-  className,
-  ...props // props を明示的に定義
 }: DashBoardContentProps) {
   const [selectedFolder, setSelectedFolder] =
     useState<FolderWithQuizzes | null>(null); // 選択されたフォルダ

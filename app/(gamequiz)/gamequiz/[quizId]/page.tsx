@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -79,8 +80,12 @@ export default function GameQuizPage({
         if (shuffledQuestions.length > 0) {
           setShuffledOptions(shuffleArray(shuffledQuestions[0].options));
         }
-      } catch (err: any) {
-        setError(err.message || "データの取得中にエラーが発生しました。");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message || "データの取得中にエラーが発生しました。");
+        } else {
+          setError("データの取得中に未知のエラーが発生しました。");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -159,9 +164,11 @@ export default function GameQuizPage({
 
           {/* 画像表示 */}
           {showImage && quiz.imagePath && (
-            <img
-              src={quiz.imagePath}
+            <Image
+              src={quiz.imagePath || "/default-placeholder.png"}
               alt="質問画像"
+              width={500}
+              height={300}
               className="w-full max-w-md mt-4 rounded shadow"
             />
           )}

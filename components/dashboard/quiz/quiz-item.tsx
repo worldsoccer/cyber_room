@@ -1,22 +1,5 @@
-// QuizItem.tsx
-// import { FolderWithQuizzes } from "@/types/quiz";
-
-// interface QuizItemProps {
-//   quiz: FolderWithQuizzes["quiz"][0];
-// }
-
-// export default function QuizItem({ quiz }: QuizItemProps) {
-//   return (
-//     <div>
-//       {/* クイズの情報を表示する */}
-//       <p>{quiz.title}</p>
-//     </div>
-//   );
-// }
-
 import { Quiz } from "@prisma/client";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import QuizOperations from "./quiz-operations";
 // import FolderOperations from "./folder-operations";

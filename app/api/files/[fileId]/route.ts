@@ -1,6 +1,5 @@
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { filePatchSchema } from "@/lib/validations/file";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";

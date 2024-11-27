@@ -22,7 +22,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import FolderDialog from "./folder-create-dialog";
 import FolderEditDialog from "./folder-edit-dialog";
 
 // フォルダを削除する関数

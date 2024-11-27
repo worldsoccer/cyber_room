@@ -26,7 +26,7 @@ export default function QuizSection({
         {/* 条件付きで FileDialog を表示 */}
         {selectedFile && <QuizCreateButton selectedFile={selectedFile} />}
       </div>
-      <QuizList quizzes={quizzes} selectedFile={selectedFile} />
+      <QuizList quizzes={quizzes} />
     </div>
   );
 }

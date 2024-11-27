@@ -1,12 +1,11 @@
-import { FolderWithQuizzes, Quiz } from "@/types/quiz";
+import { Quiz } from "@/types/quiz";
 import QuizItem from "./quiz-item";
 
 interface QuizListProps {
   quizzes: Quiz[]; // Quiz 型の配列に変更
-  selectedFile: FolderWithQuizzes["files"][0] | null;
 }
 
-export default function QuizList({ quizzes, selectedFile }: QuizListProps) {
+export default function QuizList({ quizzes }: QuizListProps) {
   return (
     <div>
       {quizzes.length ? (

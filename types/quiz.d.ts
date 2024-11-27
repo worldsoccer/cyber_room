@@ -11,3 +11,4 @@ export type FolderWithQuizzes = Prisma.FolderGetPayload<{
 
 // quizzes 型を取得
 export type Quiz = FolderWithQuizzes["files"][0]["quizzes"][0];
+export type FileWithQuizzes = FolderWithQuizzes["files"][0];

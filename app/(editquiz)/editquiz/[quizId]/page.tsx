@@ -1,16 +1,14 @@
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
-import { User } from "@prisma/client";
 import { notFound, redirect } from "next/navigation";
-import NewQuiz from "@/components/quiz/new-quiz";
 import EditQuiz from "@/components/editquiz/edit-quiz";
 
 interface EditQuizProps {
   params: Promise<{ quizId: string }>; // params を Promise として扱う
 }
 
-async function getNewQuizForUser(quizId: number, userId: string) {
+async function getNewQuizForUser(quizId: number) {
   return await db.quiz.findFirst({
     where: {
       id: quizId,
@@ -33,7 +31,7 @@ export default async function EditQuizPage({ params }: EditQuizProps) {
   }
 
   // quizを取得
-  const quiz = await getNewQuizForUser(quizId, user.id);
+  const quiz = await getNewQuizForUser(quizId);
   if (!quiz) {
     notFound(); // クイズが存在しない場合
   }

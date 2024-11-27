@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { FolderWithQuizzes } from "@/types/quiz";
+import { FolderWithQuizzes, FileWithQuizzes, Quiz } from "@/types/quiz";
 
 interface SelectQuizProps {
   folderWithQuizzes: FolderWithQuizzes[];
@@ -41,7 +41,7 @@ const SelectQuiz: React.FC<SelectQuizProps> = ({ folderWithQuizzes }) => {
               {folder.name}
             </h2>
             <ul className="pl-4 space-y-4">
-              {folder.files?.map((file: any) => (
+              {folder.files?.map((file: FileWithQuizzes) => (
                 <li key={file.id}>
                   <h3 className="text-lg font-medium text-gray-700 mb-2">
                     {file.name}
@@ -53,7 +53,7 @@ const SelectQuiz: React.FC<SelectQuizProps> = ({ folderWithQuizzes }) => {
                     テストを開始
                   </button>
                   <ul className="pl-6 list-disc text-gray-600 space-y-2">
-                    {file.quizzes?.map((quiz: any) => (
+                    {file.quizzes?.map((quiz: Quiz) => (
                       <li
                         key={quiz.id}
                         onClick={() => handleQuizStart(quiz.id)}

@@ -11,6 +11,14 @@ interface NewQuizProps {
   fileId: number; // fileId を受け取る
 }
 
+interface ParsedQuestion {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  difficulty: number;
+  explanation: string | null;
+}
+
 export default function NewQuiz({ fileId }: NewQuizProps) {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [quizTitle, setQuizTitle] = useState<string>("");
@@ -20,7 +28,6 @@ export default function NewQuiz({ fileId }: NewQuizProps) {
   const { toast } = useToast();
   const router = useRouter();
 
-  // ドラッグアンドドロップによる画像アップロード
   const onDrop = (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       setSelectedImage(acceptedFiles[0]);
@@ -33,15 +40,12 @@ export default function NewQuiz({ fileId }: NewQuizProps) {
     accept: { "image/*": [] },
   });
 
-  // クイズフォーマットのパース処理
-  const parseQuizInput = (input: string) => {
-    // 問題ごとに分割
+  const parseQuizInput = (input: string): ParsedQuestion[] => {
     const questions = input
       .split(/問題\d+:/)
       .filter(Boolean)
-      .map((block, index) => {
+      .map((block, index): ParsedQuestion => {
         try {
-          // 選択肢やその他のデータを正規表現で抽出
           const questionMatch = block.match(/^(.*?)(?=\d+\.\s|正解:)/s);
           const optionsMatch = block.match(
             /(\d+\.\s.*?)(?=(\d+\.\s|正解:|$))/gs
@@ -50,21 +54,16 @@ export default function NewQuiz({ fileId }: NewQuizProps) {
           const difficultyMatch = block.match(/難易度:\s*(\d+)/);
           const explanationMatch = block.match(/解説:\s*(.*)/s);
 
-          // 質問文
-          const question = questionMatch ? questionMatch[1].trim() : null;
-
-          // 選択肢
+          const question = questionMatch ? questionMatch[1].trim() : "";
           const options = optionsMatch
             ? optionsMatch.map((opt) => opt.replace(/^\d+\.\s*/, "").trim())
             : [];
-
-          // 正解、難易度、解説を取得
           const correctAnswer = correctAnswerMatch
             ? parseInt(correctAnswerMatch[1], 10)
-            : null;
+            : -1;
           const difficulty = difficultyMatch
             ? parseInt(difficultyMatch[1], 10)
-            : null;
+            : -1;
           const explanation = explanationMatch
             ? explanationMatch[1].trim()
             : null;
@@ -72,16 +71,21 @@ export default function NewQuiz({ fileId }: NewQuizProps) {
           if (
             !question ||
             options.length < 4 ||
-            correctAnswer === null ||
-            !difficulty
+            correctAnswer < 1 ||
+            difficulty < 1
           ) {
             throw new Error(`質問 ${index + 1} のフォーマットが不正です。`);
           }
 
           return { question, options, correctAnswer, difficulty, explanation };
-        } catch (error: any) {
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            throw new Error(
+              `質問 ${index + 1} の解析中にエラーが発生しました: ${err.message}`
+            );
+          }
           throw new Error(
-            `質問 ${index + 1} の解析中にエラーが発生しました: ${error.message}`
+            `質問 ${index + 1} の解析中に予期しないエラーが発生しました。`
           );
         }
       });
@@ -89,7 +93,6 @@ export default function NewQuiz({ fileId }: NewQuizProps) {
     return questions;
   };
 
-  // フォーム送信時の処理
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     setIsSaving(true);
@@ -100,9 +103,9 @@ export default function NewQuiz({ fileId }: NewQuizProps) {
       if (selectedImage) {
         formData.append("image", selectedImage);
       }
-      formData.append("title", quizTitle); // タイトルを追加
-      formData.append("description", quizDescription); // 説明を追加
-      formData.append("fileId", String(fileId)); // fileId を追加
+      formData.append("title", quizTitle);
+      formData.append("description", quizDescription);
+      formData.append("fileId", String(fileId));
       formData.append("questions", JSON.stringify(parsedQuestions));
 
       const response = await fetch("/api/quiz", {
@@ -117,12 +120,20 @@ export default function NewQuiz({ fileId }: NewQuizProps) {
       const data = await response.json();
       toast({ description: "クイズが正常に登録されました！" });
       router.push(`/editquiz/${data.quizId}`);
-    } catch (error) {
-      toast({
-        title: "エラー",
-        description: "入力形式を確認してください。",
-        variant: "destructive",
-      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast({
+          title: "エラー",
+          description: error.message || "入力形式を確認してください。",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "エラー",
+          description: "予期しないエラーが発生しました。",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsSaving(false);
     }

@@ -8,6 +8,15 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY || ""
 );
 
+// クイズの質問データの型
+interface QuestionData {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  difficulty?: number;
+  explanation?: string;
+}
+
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
@@ -41,7 +50,7 @@ export async function POST(req: Request) {
       );
     }
 
-    let parsedQuestions;
+    let parsedQuestions: QuestionData[];
     try {
       parsedQuestions = JSON.parse(questions);
       if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
@@ -75,7 +84,6 @@ export async function POST(req: Request) {
         }
 
         imageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/public-img-bucket/${data.path}`;
-        // console.log("Uploaded image URL:", imageUrl);
       } catch (uploadError) {
         if (uploadError instanceof Error) {
           return NextResponse.json(
@@ -102,7 +110,7 @@ export async function POST(req: Request) {
         generatedByAI: true,
         fileId,
         questions: {
-          create: parsedQuestions.map((q: any, index: number) => {
+          create: parsedQuestions.map((q: QuestionData, index: number) => {
             // 質問データの検証
             if (
               !q.question ||
@@ -138,8 +146,11 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ quizId: createdQuiz.id });
-  } catch (error: any) {
-    console.error("クイズ登録エラー:", error.message || error);
+  } catch (error: unknown) {
+    console.error(
+      "クイズ登録エラー:",
+      error instanceof Error ? error.message : error
+    );
     if (error instanceof SyntaxError) {
       return NextResponse.json(
         { error: "JSON 形式が無効です。" },
@@ -147,7 +158,12 @@ export async function POST(req: Request) {
       );
     }
     return NextResponse.json(
-      { error: error.message || "クイズ登録中にエラーが発生しました。" },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "クイズ登録中にエラーが発生しました。",
+      },
       { status: 500 }
     );
   }

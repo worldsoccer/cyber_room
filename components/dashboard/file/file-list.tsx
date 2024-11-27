@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import { FolderWithQuizzes } from "@/types/quiz";
 import FileItem from "./file-item";
 

@@ -1,14 +1,41 @@
 "use client";
 
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+
+interface Feedback {
+  text: string;
+}
+
+interface Option {
+  id: number;
+  text: string;
+  isCorrect: boolean;
+}
+
+interface Question {
+  id: number;
+  text: string;
+  difficulty: number;
+  feedback?: Feedback;
+  options: Option[];
+}
+
+interface Quiz {
+  id: number;
+  title: string;
+  description: string;
+  imagePath?: string;
+  questions: Question[];
+}
 
 interface EditQuizProps {
   quizId: number;
 }
 
 export default function EditQuiz({ quizId }: EditQuizProps) {
-  const [quiz, setQuiz] = useState<any>(null);
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { toast } = useToast();
 
@@ -20,15 +47,17 @@ export default function EditQuiz({ quizId }: EditQuizProps) {
         if (!res.ok) {
           throw new Error("クイズデータの取得に失敗しました。");
         }
-        const data = await res.json();
+        const data: Quiz = await res.json(); // 明確な型を指定
         setQuiz(data);
-      } catch (error: any) {
-        toast({
-          title: "エラー",
-          description:
-            error.message || "データの読み込み中にエラーが発生しました。",
-          variant: "destructive",
-        });
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          toast({
+            title: "エラー",
+            description:
+              error.message || "データの読み込み中にエラーが発生しました。",
+            variant: "destructive",
+          });
+        }
       } finally {
         setIsLoading(false);
       }
@@ -58,17 +87,14 @@ export default function EditQuiz({ quizId }: EditQuizProps) {
         <p>
           <strong>説明:</strong> {quiz.description}
         </p>
-        {quiz.imagePath ? ( // 画像が存在する場合にのみ表示
+        {quiz.imagePath ? (
           <div>
             <strong>画像:</strong>
-            {/* <div>{quiz.imagePath}</div> */}
-
-            <img
-              // src={
-              //   "https://nzmqqrivmefdpxpqunoq.supabase.co/storage/v1/object/public/public-img-bucket/uploads/1732495778968_.png"
-              // }
-              src={quiz.imagePath}
+            <Image
+              src={quiz.imagePath || "/default-placeholder.png"}
               alt={quiz.title}
+              width={500}
+              height={300}
               className="w-full max-w-md mt-2 rounded"
             />
           </div>
@@ -80,7 +106,7 @@ export default function EditQuiz({ quizId }: EditQuizProps) {
       {/* 質問リスト */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">質問</h2>
-        {quiz.questions.map((question: any, questionIndex: number) => (
+        {quiz.questions.map((question, questionIndex) => (
           <div key={question.id} className="border p-4 rounded space-y-2">
             <p>
               <strong>質問 {questionIndex + 1}:</strong> {question.text}
@@ -94,7 +120,7 @@ export default function EditQuiz({ quizId }: EditQuizProps) {
             <div>
               <strong>選択肢:</strong>
               <ul className="list-disc ml-5 mt-1">
-                {question.options.map((option: any, optionIndex: number) => (
+                {question.options.map((option, optionIndex) => (
                   <li
                     key={option.id}
                     className={option.isCorrect ? "text-green-600" : ""}

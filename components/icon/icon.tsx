@@ -124,7 +124,7 @@ export const Icons: {
       // stroke-width="2"
       // stroke-linecap="round"
       // stroke-linejoin="round"
-      className="lucide lucide-badge-plus"
+      className={`lucide lucide-badge-plus ${className}`}
       {...props}
     >
       <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
@@ -169,7 +169,7 @@ export const Icons: {
       <line x1="4" x2="4" y1="22" y2="15" />
     </svg>
   ),
-  ranking: ({ className, ...props }) => (
+  ranking: ({ ...props }) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="22"
@@ -194,7 +194,7 @@ export const Icons: {
       strokeWidth="2" // キャメルケースに変更
       strokeLinecap="round" // キャメルケースに変更
       strokeLinejoin="round" // キャメルケースに変更
-      className="lucide lucide-circle-play"
+      className={`lucide lucide-circle-play ${className}`}
       {...props}
     >
       <circle cx="12" cy="12" r="10" />

@@ -1,15 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
-interface EditQuizContentProps {
-  className?: string; // オプションの追加スタイル
-}
-
-export default function EditQuizContent({
-  className,
-  ...props // props を明示的に定義
-}: EditQuizContentProps) {
+export default function EditQuizContent() {
   return (
     <div className="w-full">
       {/* デスクトップビュー */}
