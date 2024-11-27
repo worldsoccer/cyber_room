@@ -11,8 +11,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactStrictMode: true,
+  eactStrictMode: true,
   images: {
+    domains: ["https://nzmqqrivmefdpxpqunoq.supabase.co"], // Supabase のドメインを追加
     remotePatterns: [
       {
         protocol: "https",
@@ -20,7 +21,8 @@ const nextConfig: NextConfig = {
         pathname: "/storage/v1/object/public/public-img-bucket/uploads/**",
       },
     ],
-    unoptimized: true, // 画像最適化を無効化
+    // 必要であれば画像最適化を無効化
+    unoptimized: process.env.NODE_ENV === "development",
   },
 };
 
