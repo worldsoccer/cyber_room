@@ -16,6 +16,11 @@ export const dashboardConfig: DashboardConfig = {
       href: "/support",
       // disabled: true,
     },
+    {
+      title: "スタート",
+      href: "/dashboard/gamequiz",
+      // disabled: true,
+    },
   ],
   sidebarNav: [
     {
