@@ -64,16 +64,15 @@ export default function GameQuizPage({
     const fetchQuiz = async () => {
       setIsLoading(true);
       try {
+        // 統一された API パスを使用
         const res = await fetch(`/api/quiz/${quizId}`);
         if (!res.ok) {
           throw new Error("クイズデータの取得に失敗しました。");
         }
         const data: Quiz = await res.json();
 
-        // 質問をシャッフル
+        // 質問をシャッフルして設定
         const shuffledQuestions = shuffleArray(data.questions);
-
-        // シャッフルされた質問でクイズをセット
         setQuiz({ ...data, questions: shuffledQuestions });
 
         // 最初の質問の選択肢をシャッフル
