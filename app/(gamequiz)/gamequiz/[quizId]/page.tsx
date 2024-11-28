@@ -175,19 +175,23 @@ export default function GameQuizPage({
           {showFeedback && (
             <div className="feedback mt-6">
               {/* 正解/不正解メッセージ */}
-              <p
-                className={`text-lg font-bold ${
-                  shuffledOptions.find((opt) => opt.id === selectedOption)
-                    ?.isCorrect
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                {shuffledOptions.find((opt) => opt.id === selectedOption)
-                  ?.isCorrect
-                  ? "正解です！"
-                  : "不正解です。"}
-              </p>
+              {shuffledOptions.find((opt) => opt.id === selectedOption)
+                ?.isCorrect ? (
+                <p className="text-lg font-bold text-green-600">正解です！</p>
+              ) : (
+                <div>
+                  <p className="text-lg font-bold text-red-600">不正解です。</p>
+                  <p className="text-lg mt-2">
+                    正解は
+                    <span className="font-semibold text-blue-600">
+                      {shuffledOptions.findIndex((opt) => opt.isCorrect) + 1}.{" "}
+                      {shuffledOptions.find((opt) => opt.isCorrect)?.text ||
+                        "データエラー"}
+                    </span>
+                    です。
+                  </p>
+                </div>
+              )}
 
               {/* 解説の表示 */}
               <p className="mt-4 text-gray-700">

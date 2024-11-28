@@ -178,14 +178,14 @@ const GameTestPage = ({ params }: { params: Promise<{ fileId: string }> }) => {
 
   if (isTestFinished) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen text-center">
+      <div className="flex flex-col items-center justify-start min-h-screen text-center p-4">
         <h1 className="text-2xl font-bold mb-4">テスト終了</h1>
         <p className="text-xl">
           {questions.length}問中{correctAnswers}問正解しました！
         </p>
-        <div className="mt-6 text-left">
+        <div className="mt-6 w-full max-w-3xl text-left">
           <h2 className="text-xl font-semibold mb-4">結果一覧</h2>
-          <ul className="list-disc pl-6">
+          <ul className="list-disc pl-6 max-h-[400px] overflow-y-auto border rounded p-4">
             {results.map((result, index) => (
               <li
                 key={index}
@@ -207,6 +207,38 @@ const GameTestPage = ({ params }: { params: Promise<{ fileId: string }> }) => {
       </div>
     );
   }
+
+  // if (isTestFinished) {
+  //   return (
+  //     <div className="flex flex-col items-center justify-center h-screen text-center">
+  //       <h1 className="text-2xl font-bold mb-4">テスト終了</h1>
+  //       <p className="text-xl">
+  //         {questions.length}問中{correctAnswers}問正解しました！
+  //       </p>
+  //       <div className="mt-6 text-left">
+  //         <h2 className="text-xl font-semibold mb-4">結果一覧</h2>
+  //         <ul className="list-disc pl-6">
+  //           {results.map((result, index) => (
+  //             <li
+  //               key={index}
+  //               className={`mb-2 ${
+  //                 result.isCorrect ? "text-green-600" : "text-red-600"
+  //               }`}
+  //             >
+  //               {result.question} - {result.isCorrect ? "正解" : "不正解"}
+  //             </li>
+  //           ))}
+  //         </ul>
+  //       </div>
+  //       <button
+  //         onClick={() => router.push("/dashboard")}
+  //         className="mt-6 py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+  //       >
+  //         戻る
+  //       </button>
+  //     </div>
+  //   );
+  // }
 
   if (!currentQuestion) {
     return (
@@ -241,7 +273,27 @@ const GameTestPage = ({ params }: { params: Promise<{ fileId: string }> }) => {
 
       {selectedOption !== null && showExplanation && (
         <div className="mt-6">
-          <p className="text-gray-700">{currentQuestion.feedback.text}</p>
+          {shuffledOptions.find((opt) => opt.id === selectedOption)
+            ?.isCorrect ? (
+            <p className="text-green-600 font-bold">正解です！</p>
+          ) : (
+            <div>
+              <p className="text-red-600 font-bold">不正解です。</p>
+              <p className="text-gray-700">
+                正解は{" "}
+                <span className="text-blue-600 font-semibold">
+                  {shuffledOptions.findIndex((opt) => opt.isCorrect) + 1}.
+                </span>{" "}
+                {shuffledOptions.find((opt) => opt.isCorrect)?.text ||
+                  "データエラー"}
+              </p>
+            </div>
+          )}
+          {showExplanation && (
+            <div className="mt-4">
+              <p className="text-gray-700">{currentQuestion.feedback.text}</p>
+            </div>
+          )}
           {currentQuizImagePath && (
             <Image
               src={currentQuizImagePath}
@@ -249,6 +301,10 @@ const GameTestPage = ({ params }: { params: Promise<{ fileId: string }> }) => {
               width={500}
               height={300}
               className="mt-4 rounded shadow"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "/default-placeholder.png";
+              }}
             />
           )}
         </div>
