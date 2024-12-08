@@ -1,23 +1,24 @@
-// import FolderItem from "@/components/dashboard/folder-item";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
 import DashBoardHeader from "@/components/dashboard/dashboard-header";
 import DashBoardShell from "@/components/dashboard/dashboard-shell";
-// import FolderCreateButton from "@/components/dashboard/folder-create-button";
 import DashBoardContent from "@/components/dashboard/dashboard-content";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export default async function DashboardPage() {
-  const user = await getCurrentUser();
+  const session = await getServerSession(authOptions);
 
-  if (!user) {
+  if (!session?.user.id) {
     redirect("/login");
   }
+
+  // console.log("session", session?.user);
 
   // フォルダからクイズを取得する関数
   const folderWithQuizzes = await db.folder.findMany({
     where: {
-      authorId: user.id,
+      authorId: session?.user.id,
     },
     include: {
       files: {

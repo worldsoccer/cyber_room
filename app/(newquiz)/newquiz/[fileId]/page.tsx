@@ -1,8 +1,9 @@
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/session";
 import { notFound, redirect } from "next/navigation";
 import NewQuiz from "@/components/quiz/new-quiz";
+import { getServerSession } from "next-auth";
+import { NextResponse } from "next/server";
 
 interface NewQuizProps {
   params: Promise<{ fileId: string }>; // params を Promise として扱う
@@ -20,7 +21,15 @@ async function getNewQuizForUser(fileId: number, userId: string) {
 export default async function NewQuizPage({ params }: NewQuizProps) {
   const resolvedParams = await params; // params を await で解決
 
-  const user = await getCurrentUser();
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
+  }
+
+  const { user } = session;
+
+  // const user = await getCurrentUser();
   if (!user) {
     redirect(authOptions.pages?.signIn || "/login");
   }
