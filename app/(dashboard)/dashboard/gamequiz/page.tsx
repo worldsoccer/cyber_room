@@ -1,7 +1,6 @@
 import SelectQuiz from "@/components/quiz/select-quiz";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/session";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
