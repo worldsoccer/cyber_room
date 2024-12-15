@@ -36,6 +36,9 @@ model User {
   folders      Folder[]      @relation("UserFolders") // フォルダ作成リレーション
   answers      Answer[] // Answerとのリレーション
 
+  towerProgress TowerProgress[]
+  battleLogs    BattleLog[]
+
   @@map(name: "users")
 }
 
@@ -86,6 +89,7 @@ model Folder {
   files     File[]
   author    User     @relation(fields: [authorId], references: [id], name: "UserFolders")
   authorId  String // Userモデルのidフィールドに合わせてString型に修正
+  quizCount Int      @default(0) // フォルダに紐づくクイズ数
 }
 
 model File {
@@ -113,6 +117,9 @@ model Quiz {
   progresses    Progress[] // Progressとの逆方向リレーションを追加
   imagePath     String?
   generatedByAI Boolean    @default(false)
+
+  floor  Floor[] @relation("FloorQuizzes")
+  bosses Boss[]  @relation("BossQuizzes")
 }
 
 model Question {
@@ -199,4 +206,54 @@ model Feedback {
   questionId Int?      @unique // 質問ごとの解説は一意
   quiz       Quiz?     @relation(fields: [quizId], references: [id], name: "QuizFeedback")
   quizId     Int? // クイズ全体に対する解説も許可
+}
+
+model Tower {
+  id          Int             @id @default(autoincrement())
+  name        String // 塔の名前
+  description String? // 塔の説明
+  floors      Floor[] // 関連する階層
+  progress    TowerProgress[] // 進行状況リレーション
+}
+
+model Floor {
+  id         Int    @id @default(autoincrement())
+  tower      Tower  @relation(fields: [towerId], references: [id])
+  towerId    Int
+  level      Int
+  difficulty Int
+  quizzes    Quiz[] @relation("FloorQuizzes")
+}
+
+model TowerProgress {
+  id           Int     @id @default(autoincrement())
+  user         User    @relation(fields: [userId], references: [id])
+  userId       String
+  tower        Tower   @relation(fields: [towerId], references: [id])
+  towerId      Int
+  currentFloor Int
+  cleared      Boolean @default(false)
+}
+
+model Boss {
+  id          Int         @id @default(autoincrement())
+  name        String // ボスの名前
+  description String? // ボスの説明
+  difficulty  Int // ボスの難易度
+  hp          Int // ボスの体力
+  attackPower Int // ボスの攻撃力
+  quizzes     Quiz[]      @relation("BossQuizzes") // 対応するリレーションを指定
+  battleLogs  BattleLog[]
+}
+
+model BattleLog {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String // ユーザーID
+  boss        Boss     @relation(fields: [bossId], references: [id])
+  bossId      Int // ボスID
+  damageDealt Int // ユーザーが与えたダメージ
+  damageTaken Int // ユーザーが受けたダメージ
+  battleDate  DateTime @default(now()) // バトル日時
+  result      String // 勝敗結果 ("win" or "lose")
 }
