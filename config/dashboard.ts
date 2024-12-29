@@ -7,18 +7,18 @@ export const dashboardConfig: DashboardConfig = {
       href: "/",
     },
     {
-      title: "ドキュメント",
-      href: "/docs",
+      title: "アルティメットチャレンジ",
+      href: "/dashboard/challenge",
       // disabled: true,
     },
     {
-      title: "サポート",
-      href: "/support",
-      // disabled: true,
-    },
-    {
-      title: "スタート",
+      title: "クイズゲーム",
       href: "/dashboard/gamequiz",
+      // disabled: true,
+    },
+    {
+      title: "アルティメットヒストリー",
+      href: "/dashboard/history",
       // disabled: true,
     },
   ],
@@ -33,12 +33,6 @@ export const dashboardConfig: DashboardConfig = {
       title: "ランキング",
       href: "/dashboard/leaderboard",
       icon: "ranking",
-      // disabled: true,
-    },
-    {
-      title: "スタート",
-      href: "/dashboard/gamequiz",
-      icon: "start",
       // disabled: true,
     },
     {

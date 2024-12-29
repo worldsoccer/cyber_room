@@ -145,16 +145,6 @@ export async function POST(req: Request) {
       },
     });
 
-    // // フォルダのクイズ数を問題数分インクリメント
-    // const questionCount = parsedQuestions.length;
-
-    // if (questionCount > 0) {
-    //   await db.folder.update({
-    //     where: { id: fileId },
-    //     data: { quizCount: { increment: questionCount } },
-    //   });
-    // }
-
     return NextResponse.json({ quizId: createdQuiz.id });
   } catch (error: unknown) {
     console.error(

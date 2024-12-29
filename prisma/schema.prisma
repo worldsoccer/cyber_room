@@ -36,8 +36,10 @@ model User {
   folders      Folder[]      @relation("UserFolders") // フォルダ作成リレーション
   answers      Answer[] // Answerとのリレーション
 
-  towerProgress TowerProgress[]
-  battleLogs    BattleLog[]
+  towerProgress    TowerProgress[]
+  battleLogs       BattleLog[]
+  gameProgress     GameProgress[] // GameProgressの逆リレーションを追加
+  incorrectAnswers IncorrectAnswer[] // IncorrectAnswerの逆リレーションを追加
 
   @@map(name: "users")
 }
@@ -89,7 +91,6 @@ model Folder {
   files     File[]
   author    User     @relation(fields: [authorId], references: [id], name: "UserFolders")
   authorId  String // Userモデルのidフィールドに合わせてString型に修正
-  quizCount Int      @default(0) // フォルダに紐づくクイズ数
 }
 
 model File {
@@ -123,15 +124,16 @@ model Quiz {
 }
 
 model Question {
-  id         Int       @id @default(autoincrement())
-  text       String // 質問文
-  quiz       Quiz      @relation(fields: [quizId], references: [id])
-  quizId     Int // 親クイズのID
-  difficulty Int // 難易度
-  options    Option[] // 選択肢
-  imagePath  String? // 画像 (オプション)
-  feedback   Feedback? @relation("QuestionFeedback") // 解説とのリレーション
-  answers    Answer[] // 回答とのリレーション
+  id               Int               @id @default(autoincrement())
+  text             String // 質問文
+  quiz             Quiz              @relation(fields: [quizId], references: [id])
+  quizId           Int // 親クイズのID
+  difficulty       Int // 難易度
+  options          Option[] // 選択肢
+  imagePath        String? // 画像 (オプション)
+  feedback         Feedback?         @relation("QuestionFeedback") // 解説とのリレーション
+  answers          Answer[] // 回答とのリレーション
+  incorrectAnswers IncorrectAnswer[] // IncorrectAnswerの逆リレーションを追加
 }
 
 model Option {
@@ -256,4 +258,26 @@ model BattleLog {
   damageTaken Int // ユーザーが受けたダメージ
   battleDate  DateTime @default(now()) // バトル日時
   result      String // 勝敗結果 ("win" or "lose")
+}
+
+model GameProgress {
+  id             Int       @id @default(autoincrement())
+  userId         String // ユーザーID
+  folderId       Int // フォルダのID
+  mode           String // クリアしたモード (例: "easy", "normal", "hard")
+  totalQuestions Int
+  clearCount     Int       @default(0)
+  lastClearedAt  DateTime?
+  User           User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, folderId, mode]) // モードごとのユニークキーを設定
+}
+
+model IncorrectAnswer {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId Int
+  answeredAt DateTime @default(now())
 }
