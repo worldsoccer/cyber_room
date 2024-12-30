@@ -1,10 +1,9 @@
 import SelectQuizMode from "@/features/challenge/select_quiz_mode";
-import { challengeConfig } from "@/config/challenge";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 export default async function ChallengePage() {
   const session = await getServerSession(authOptions);

@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     // 必要なパラメータを取得
     const { folderId, mode, questionCount } = body;
 
-    console.log("Request body:", body); // リクエストボディを確認
+    // console.log("Request body:", body); // リクエストボディを確認
 
     // パラメータのバリデーション
     if (!folderId || !mode || !questionCount) {
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log("クリア情報が正常に保存されました。");
+    // console.log("クリア情報が正常に保存されました。");
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
