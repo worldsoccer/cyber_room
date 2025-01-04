@@ -3,6 +3,7 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface Feedback {
   text: string;
@@ -38,6 +39,7 @@ export default function EditQuiz({ quizId }: EditQuizProps) {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     // クイズデータを取得
@@ -76,6 +78,12 @@ export default function EditQuiz({ quizId }: EditQuizProps) {
 
   return (
     <div className="space-y-6">
+      <button
+        onClick={() => router.back()} // 前の画面に戻る
+        className="px-4 py-2 bg-gray-300 text-black rounded mt-4"
+      >
+        戻る
+      </button>
       <h1 className="text-2xl font-bold">クイズ編集</h1>
 
       {/* クイズ情報 */}
