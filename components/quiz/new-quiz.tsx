@@ -105,6 +105,16 @@ export default function NewQuiz({ fileId }: NewQuizProps) {
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
+
+    if (!selectedImage) {
+      const userConfirmed = window.confirm(
+        "画像がアップロードされていません。このまま保存を続けますか？"
+      );
+      if (!userConfirmed) {
+        return; // 処理を中断して戻る
+      }
+    }
+
     setIsSaving(true);
 
     try {
