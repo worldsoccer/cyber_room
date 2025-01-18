@@ -28,6 +28,13 @@ model User {
   stripePriceId          String?   @map(name: "stripe_price_id")
   stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
 
+  experience   Int @default(0) // 現在の経験値
+  level        Int @default(1) // 現在のレベル
+  hp           Int @default(100) // 現在のHP
+  maxHp        Int @default(100) // 最大HP
+  attackPower  Int @default(10) // 攻撃力
+  healingPower Int @default(10) // 回復力
+
   badges       Badge[]       @relation("UserBadges")
   achievements Achievement[]
   reminders    Reminder[]
@@ -36,10 +43,9 @@ model User {
   folders      Folder[]      @relation("UserFolders") // フォルダ作成リレーション
   answers      Answer[] // Answerとのリレーション
 
-  towerProgress    TowerProgress[]
-  battleLogs       BattleLog[]
   gameProgress     GameProgress[] // GameProgressの逆リレーションを追加
   incorrectAnswers IncorrectAnswer[] // IncorrectAnswerの逆リレーションを追加
+  bosses           Boss[]            @relation("UserBosses") // Bossとのリレーション
 
   @@map(name: "users")
 }
@@ -119,8 +125,7 @@ model Quiz {
   imagePath     String?
   generatedByAI Boolean    @default(false)
 
-  floor  Floor[] @relation("FloorQuizzes")
-  bosses Boss[]  @relation("BossQuizzes")
+  floor Floor[] @relation("FloorQuizzes")
 }
 
 model Question {
@@ -211,53 +216,34 @@ model Feedback {
 }
 
 model Tower {
-  id          Int             @id @default(autoincrement())
-  name        String // 塔の名前
-  description String? // 塔の説明
-  floors      Floor[] // 関連する階層
-  progress    TowerProgress[] // 進行状況リレーション
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
 }
 
 model Floor {
   id         Int    @id @default(autoincrement())
-  tower      Tower  @relation(fields: [towerId], references: [id])
   towerId    Int
   level      Int
   difficulty Int
   quizzes    Quiz[] @relation("FloorQuizzes")
 }
 
-model TowerProgress {
-  id           Int     @id @default(autoincrement())
-  user         User    @relation(fields: [userId], references: [id])
-  userId       String
-  tower        Tower   @relation(fields: [towerId], references: [id])
-  towerId      Int
-  currentFloor Int
-  cleared      Boolean @default(false)
-}
-
 model Boss {
-  id          Int         @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String // ボスの名前
   description String? // ボスの説明
-  difficulty  Int // ボスの難易度
-  hp          Int // ボスの体力
-  attackPower Int // ボスの攻撃力
-  quizzes     Quiz[]      @relation("BossQuizzes") // 対応するリレーションを指定
-  battleLogs  BattleLog[]
-}
-
-model BattleLog {
-  id          Int      @id @default(autoincrement())
-  user        User     @relation(fields: [userId], references: [id])
-  userId      String // ユーザーID
-  boss        Boss     @relation(fields: [bossId], references: [id])
-  bossId      Int // ボスID
-  damageDealt Int // ユーザーが与えたダメージ
-  damageTaken Int // ユーザーが受けたダメージ
-  battleDate  DateTime @default(now()) // バトル日時
-  result      String // 勝敗結果 ("win" or "lose")
+  hp          Int // 現在のHP
+  maxHp       Int // 最大HP
+  attackPower Int // 攻撃力
+  difficulty  Int // 推奨レベル
+  imageUrl    String? // ボスの画像URLまたはパス
+  attackTurn  Int // ボスの攻撃ターン間隔
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  authorId    String // 作成者のID
+  author      User     @relation(fields: [authorId], references: [id], name: "UserBosses")
 }
 
 model GameProgress {

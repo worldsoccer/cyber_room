@@ -7,13 +7,18 @@ export const dashboardConfig: DashboardConfig = {
       href: "/",
     },
     {
+      title: "クイズゲーム",
+      href: "/dashboard/gamequiz",
+      // disabled: true,
+    },
+    {
       title: "アルティメットチャレンジ",
       href: "/dashboard/challenge",
       // disabled: true,
     },
     {
-      title: "クイズゲーム",
-      href: "/dashboard/gamequiz",
+      title: "バトルタワー",
+      href: "/dashboard/battletower",
       // disabled: true,
     },
     {
@@ -27,6 +32,12 @@ export const dashboardConfig: DashboardConfig = {
       title: "クイズ一覧",
       href: "/dashboard",
       icon: "quiz",
+      // disabled: true,
+    },
+    {
+      title: "バトルタワー設定",
+      href: "/dashboard/btltwrstg",
+      icon: "billing",
       // disabled: true,
     },
     {

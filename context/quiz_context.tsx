@@ -1,5 +1,7 @@
 "use client";
 
+import { Quiz } from "@/types/quiz";
+// import { Quiz } from "@/types/quiz";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface Folder {
@@ -15,6 +17,12 @@ interface QuizContextType {
   setSelectedQuestions: (questions: number | null) => void;
   selectedMode: string | null;
   setSelectedMode: (mode: string | null) => void;
+  selectedFloorLevel: number | null;
+  setSelectedFloorLevel: (level: number | null) => void;
+  difficulty: number | null;
+  setDifficulty: (difficulty: number | null) => void;
+  selectedBattleQuizzes: Quiz[];
+  setSelectedBattleQuizzes: (quizzes: Quiz[]) => void;
 }
 
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
@@ -25,6 +33,13 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     null
   );
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
+  const [selectedFloorLevel, setSelectedFloorLevel] = useState<number | null>(
+    null
+  );
+  const [difficulty, setDifficulty] = useState<number | null>(null);
+  const [selectedBattleQuizzes, setSelectedBattleQuizzes] = useState<Quiz[]>(
+    []
+  );
 
   return (
     <QuizContext.Provider
@@ -35,6 +50,12 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         setSelectedQuestions,
         selectedMode,
         setSelectedMode,
+        selectedFloorLevel,
+        setSelectedFloorLevel,
+        difficulty,
+        setDifficulty,
+        selectedBattleQuizzes,
+        setSelectedBattleQuizzes,
       }}
     >
       {children}
