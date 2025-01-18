@@ -359,7 +359,7 @@ export default function BattleTower() {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-screen overflow-y-scroll">
       <div className="flex-shrink-0 p-4 text-center bg-gray-200">
         <h2 className="text-xl font-semibold">フロア: {selectedFloorLevel}</h2>
         <p>
@@ -367,7 +367,7 @@ export default function BattleTower() {
         </p>
       </div>
       {/* 上画面: ユーザー */}
-      <div className="flex-grow p-4 bg-blue-100 overflow-y-auto text-center">
+      <div className="flex-grow p-4 bg-blue-100  text-center">
         <h1 className="text-2xl font-bold">あなた</h1>
         <p>HP: {userHp}</p>
 
@@ -493,20 +493,32 @@ export default function BattleTower() {
       {/* 下画面: ボス */}
       {boss && (
         <div className="flex-shrink-0 p-4 bg-red-100 text-center">
-          <h1 className="text-2xl font-bold">{boss.name}</h1>
-          <div className="flex justify-center flex-shrink-0 md:w-1/2 overflow-auto">
-            <Image
-              src={boss.imageUrl}
-              alt={boss.name}
-              width={500}
-              height={300}
-              className="rounded object-contain max-w-[90%] sm:max-w-[70%] max-h-[300px]" // 高さ制限を追加
-            />
+          <h1 className="text-2xl font-bold mb-4">{boss.name}</h1>
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+            {/* ボスの画像 */}
+            <div className="flex-shrink-0">
+              <Image
+                src={boss.imageUrl}
+                alt={boss.name}
+                width={500} // サイズ調整
+                height={300} // サイズ調整
+                className="rounded object-contain max-w-[200px] max-h-[200px]"
+              />
+            </div>
+            {/* ボスのステータス */}
+            <div className="text-left">
+              <p className="text-lg font-semibold">HP: {bossHp}</p>
+              <p className="text-lg font-semibold">
+                攻撃力: {boss.attackPower}
+              </p>
+              <p className="text-lg font-semibold">
+                攻撃ターン数: {boss.attackTurn}
+              </p>
+              <p className="text-lg font-semibold">
+                次の攻撃まで: {remainingBossTurns} ターン
+              </p>
+            </div>
           </div>
-          <p>HP: {bossHp}</p>
-          <p>攻撃力: {boss.attackPower}</p>
-          <p>攻撃ターン数: {boss.attackTurn}</p>
-          <p>次の攻撃まで: {remainingBossTurns} ターン</p>
         </div>
       )}
     </div>
