@@ -370,14 +370,15 @@ export default function BattleTower() {
       {boss && (
         <div className="flex-shrink-0 p-4 bg-red-100 text-center">
           <h1 className="text-2xl font-bold">{boss.name}</h1>
-          <Image
-            src={boss.imageUrl}
-            alt={boss.name}
-            width={500}
-            height={300}
-            style={{ width: "auto", height: "auto" }} // 比率維持のために設定
-            className="rounded"
-          />
+          <div className="flex justify-center flex-shrink-0 md:w-1/2 overflow-auto">
+            <Image
+              src={boss.imageUrl}
+              alt={boss.name}
+              width={500}
+              height={300}
+              className="rounded object-contain max-w-[90%] sm:max-w-[70%] max-h-[300px]" // 高さ制限を追加
+            />
+          </div>
           <p>HP: {bossHp}</p>
           <p>攻撃力: {boss.attackPower}</p>
           <p>攻撃ターン数: {boss.attackTurn}</p>
@@ -455,8 +456,7 @@ export default function BattleTower() {
                     alt="クイズ画像"
                     width={500}
                     height={300}
-                    style={{ width: "auto", height: "auto" }} // 比率維持のために設定
-                    className="rounded"
+                    className="rounded object-contain max-w-full h-auto"
                   />
                 </div>
               )}
