@@ -366,51 +366,7 @@ export default function BattleTower() {
           ボス {currentBossIndex + 1} / {battleData?.bosses.length}
         </p>
       </div>
-      {/* 上画面: ボス */}
-      {boss && (
-        <div className="flex-shrink-0 p-4 bg-red-100 text-center">
-          <h1 className="text-2xl font-bold">{boss.name}</h1>
-          <div className="flex justify-center flex-shrink-0 md:w-1/2 overflow-auto">
-            <Image
-              src={boss.imageUrl}
-              alt={boss.name}
-              width={500}
-              height={300}
-              className="rounded object-contain max-w-[90%] sm:max-w-[70%] max-h-[300px]" // 高さ制限を追加
-            />
-          </div>
-          <p>HP: {bossHp}</p>
-          <p>攻撃力: {boss.attackPower}</p>
-          <p>攻撃ターン数: {boss.attackTurn}</p>
-          <p>次の攻撃まで: {remainingBossTurns} ターン</p>
-        </div>
-      )}
-
-      {/* ゲーム終了メッセージ */}
-      {gameOver && (
-        <div className="p-4 text-center">
-          {gameOver === "win" ? (
-            <h2 className="text-2xl font-bold text-green-600">
-              勝利しました！
-            </h2>
-          ) : (
-            <h2 className="text-2xl font-bold text-red-600">敗北しました...</h2>
-          )}
-          {/* <button
-            onClick={resetGame}
-            className="px-4 py-2 mt-4 bg-blue-500 text-white rounded"
-          >
-            ゲームをリセット
-          </button> */}
-        </div>
-      )}
-
-      {/* ターン数 */}
-      <div className="flex-shrink-0 p-4 text-center bg-gray-100">
-        <h2 className="text-xl font-semibold">ターン数: {turnCount}</h2>
-      </div>
-
-      {/* 下画面: 自分 */}
+      {/* 上画面: ユーザー */}
       <div className="flex-grow p-4 bg-blue-100 overflow-y-auto text-center">
         <h1 className="text-2xl font-bold">あなた</h1>
         <p>HP: {userHp}</p>
@@ -515,6 +471,44 @@ export default function BattleTower() {
           </div>
         )}
       </div>
+
+      {/* ゲーム終了メッセージ */}
+      {gameOver && (
+        <div className="p-4 text-center">
+          {gameOver === "win" ? (
+            <h2 className="text-2xl font-bold text-green-600">
+              勝利しました！
+            </h2>
+          ) : (
+            <h2 className="text-2xl font-bold text-red-600">敗北しました...</h2>
+          )}
+        </div>
+      )}
+
+      {/* ターン数 */}
+      <div className="flex-shrink-0 p-4 text-center bg-gray-100">
+        <h2 className="text-xl font-semibold">ターン数: {turnCount}</h2>
+      </div>
+
+      {/* 下画面: ボス */}
+      {boss && (
+        <div className="flex-shrink-0 p-4 bg-red-100 text-center">
+          <h1 className="text-2xl font-bold">{boss.name}</h1>
+          <div className="flex justify-center flex-shrink-0 md:w-1/2 overflow-auto">
+            <Image
+              src={boss.imageUrl}
+              alt={boss.name}
+              width={500}
+              height={300}
+              className="rounded object-contain max-w-[90%] sm:max-w-[70%] max-h-[300px]" // 高さ制限を追加
+            />
+          </div>
+          <p>HP: {bossHp}</p>
+          <p>攻撃力: {boss.attackPower}</p>
+          <p>攻撃ターン数: {boss.attackTurn}</p>
+          <p>次の攻撃まで: {remainingBossTurns} ターン</p>
+        </div>
+      )}
     </div>
   );
 }
