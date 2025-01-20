@@ -8,7 +8,7 @@ const battleConfig = {
   healingPowerIncreasePerLevel: 1, // レベルアップごとの回復力増加量
   difficultyIncrementFloor: 10, // 難易度が上がる階層の単位
   damageDivisor: 5, // プレイヤーのダメージ分母
-  bossCriticalHitChance: 1 / 10, // クリティカルヒットの確率
+  bossCriticalHitChance: 1 / 20, // クリティカルヒットの確率
   bossCriticalHitMultiplier: 3, // クリティカルヒット時のダメージ倍率
   playerCriticalHitChance: 10, // プレイヤーのクリティカルヒット発動確率 (1/10)
   playerCriticalHitMultiplier: 2, // プレイヤーのクリティカルヒット時のダメージ倍率
