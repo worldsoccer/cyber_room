@@ -50,22 +50,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // 難易度に基づいてボス情報を取得
-    const bosses = await db.boss.findMany({
-      where: { difficulty },
-    });
+    // 難易度に基づいてボス情報を取得 ランダムでボスを選択
+    const allBosses = await db.boss.findMany({ where: { difficulty } });
 
-    if (bosses.length === 0) {
+    if (allBosses.length === 0) {
       return NextResponse.json(
         { error: "No bosses found for the provided difficulty" },
         { status: 404 }
       );
     }
 
-    // ランダムでボスを選択
-    const allBosses = await db.boss.findMany({ where: { difficulty } });
+    const bossCount = Math.ceil(selectedFloorLevel / 10);
     const selectedBosses = Array.from(
-      { length: selectedFloorLevel },
+      { length: bossCount },
       () => allBosses[Math.floor(Math.random() * allBosses.length)]
     );
 
