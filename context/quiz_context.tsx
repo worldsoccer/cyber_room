@@ -17,8 +17,8 @@ interface QuizContextType {
   setSelectedQuestions: (questions: number | null) => void;
   selectedMode: string | null;
   setSelectedMode: (mode: string | null) => void;
-  selectedFloorLevel: number | null;
-  setSelectedFloorLevel: (level: number | null) => void;
+  selectedUserLevel: number | null;
+  setSelectedUserLevel: (level: number | null) => void;
   difficulty: number | null;
   setDifficulty: (difficulty: number | null) => void;
   selectedBattleQuizzes: Quiz[];
@@ -33,7 +33,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     null
   );
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
-  const [selectedFloorLevel, setSelectedFloorLevel] = useState<number | null>(
+  const [selectedUserLevel, setSelectedUserLevel] = useState<number | null>(
     null
   );
   const [difficulty, setDifficulty] = useState<number | null>(null);
@@ -50,8 +50,8 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         setSelectedQuestions,
         selectedMode,
         setSelectedMode,
-        selectedFloorLevel,
-        setSelectedFloorLevel,
+        selectedUserLevel,
+        setSelectedUserLevel,
         difficulty,
         setDifficulty,
         selectedBattleQuizzes,

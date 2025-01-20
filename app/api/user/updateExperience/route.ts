@@ -28,26 +28,24 @@ export async function POST(request: Request) {
     // 初期化
     let totalExperience = user.experience + experienceGained; // 現在の経験値 + 獲得経験値
     let newLevel = user.level;
+    let bonusIncrement = 0; // 特定レベル到達時の追加増加量
 
-    // console.log(
-    //   "Initial: TotalExperience=",
-    //   totalExperience,
-    //   "Level=",
-    //   newLevel
-    // );
-
+    // レベルアップ処理
     if (experienceGained > 0) {
-      // レベルアップ処理
       while (totalExperience >= newLevel * battleConfig.levelUpMultiplier) {
         const levelThreshold = newLevel * battleConfig.levelUpMultiplier;
         totalExperience -= levelThreshold; // 必要経験値を差し引く
         newLevel += 1; // レベルアップ
-        // console.log(
-        //   `Level Up! New Level: ${newLevel}, Remaining Experience: ${totalExperience}`
-        // );
+
+        // 特定レベル（5, 10, 15, ...）に到達した場合の処理
+        if (newLevel % battleConfig.levelMilestone === 0) {
+          bonusIncrement += battleConfig.iIncreasePerLevel; // 追加で+2
+        }
       }
-    } else if (experienceGained < 0) {
-      // レベルダウン処理
+    }
+
+    // レベルダウン処理
+    if (experienceGained < 0) {
       while (
         newLevel > 1 &&
         totalExperience < (newLevel - 1) * battleConfig.levelUpMultiplier
@@ -55,25 +53,13 @@ export async function POST(request: Request) {
         newLevel -= 1; // レベルダウン
         const levelThreshold = newLevel * battleConfig.levelUpMultiplier;
         totalExperience += levelThreshold; // 必要経験値を繰り戻す
-        // console.log(
-        //   `Level Down! New Level: ${newLevel}, Remaining Experience: ${totalExperience}`
-        // );
+
+        // 特定レベル（例: 4, 9, 14...）を下回った場合の処理
+        if ((newLevel + 1) % battleConfig.levelMilestone === 0) {
+          bonusIncrement -= battleConfig.iIncreasePerLevel; // 追加増加量を取り消す
+        }
       }
     }
-
-    // console.log(
-    //   "Final: RemainingExperience=",
-    //   totalExperience,
-    //   "Level=",
-    //   newLevel
-    // );
-
-    // レベル差分を計算
-    const levelDifference = newLevel - user.level;
-
-    // 特定レベルごとに+2の増加分を計算
-    const additionalMultiplier =
-      Math.floor(newLevel / 10) - Math.floor(user.level / 10); // 10ごとの増加回数
 
     // ユーザー情報を更新
     const updatedUser = await db.user.update({
@@ -81,22 +67,10 @@ export async function POST(request: Request) {
       data: {
         experience: totalExperience,
         level: newLevel,
-        hp:
-          user.hp +
-          levelDifference * battleConfig.hpIncreasePerLevel +
-          additionalMultiplier * 2, // 10ごとに+2
-        maxHp:
-          user.maxHp +
-          levelDifference * battleConfig.hpIncreasePerLevel +
-          additionalMultiplier * 2, // 10ごとに+2
-        attackPower:
-          user.attackPower +
-          levelDifference * battleConfig.attackPowerIncreasePerLevel +
-          additionalMultiplier * 2, // 10ごとに+2
-        healingPower:
-          user.healingPower +
-          levelDifference * battleConfig.healingPowerIncreasePerLevel +
-          additionalMultiplier * 2, // 10ごとに+2
+        hp: user.hp + bonusIncrement, // 特定レベル到達時に+2
+        maxHp: user.maxHp + bonusIncrement, // 特定レベル到達時に+2
+        attackPower: user.attackPower + bonusIncrement, // 特定レベル到達時に+2
+        healingPower: user.healingPower + bonusIncrement, // 特定レベル到達時に+2
       },
     });
 

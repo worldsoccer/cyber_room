@@ -27,12 +27,8 @@ export default function BattleTowerSelection({
   userLevel,
   folders,
 }: BattleTowerSelectionProps) {
-  const {
-    selectedFloorLevel,
-    setSelectedFloorLevel,
-    setDifficulty,
-    setSelectedBattleQuizzes,
-  } = useQuizContext(); // QuizContext を利用
+  const { setSelectedUserLevel, setDifficulty, setSelectedBattleQuizzes } =
+    useQuizContext(); // QuizContext を利用
   const [selectedQuizzes, setSelectedQuizzes] = useState<Quiz[]>([]);
   const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
   const [selectedFileIds, setSelectedFileIds] = useState<number[]>([]); // 複数ファイルを選択
@@ -44,12 +40,9 @@ export default function BattleTowerSelection({
   const nextLevelExp = userLevel * battleConfig.levelUpMultiplier;
   const remainingExp = nextLevelExp - userExperience;
 
-  // 階層を1～ユーザーのレベル以下まで動的に生成
-  const floorLevels = Array.from({ length: userLevel }, (_, i) => i + 1);
-
   // 階層に基づいて難易度を計算
   const calculateDifficulty = (floorLevel: number) => {
-    return Math.ceil(floorLevel / battleConfig.difficultyIncrementFloor); // 10階ごとに難易度が1ずつ増加
+    return Math.ceil(floorLevel / battleConfig.difficultyIncrementFloor) + 1; // 10階ごとに難易度が1ずつ増加
   };
 
   // フォルダ選択処理
@@ -92,11 +85,6 @@ export default function BattleTowerSelection({
     setSelectedQuizzes([]); // ファイルをクリアするとクイズもリセット
   };
 
-  // 階層選択処理
-  const handleFloorChange = (floorLevel: number) => {
-    setSelectedFloorLevel(floorLevel);
-  };
-
   // クイズ選択処理
   const handleQuizToggle = (quiz: Quiz) => {
     setSelectedQuizzes((prev) =>
@@ -108,14 +96,15 @@ export default function BattleTowerSelection({
 
   //
   const handleStartBattle = () => {
-    if (selectedQuizzes.length === 0 || selectedFloorLevel === null) {
-      alert("階層とクイズを選択してください！");
+    if (selectedQuizzes.length === 0) {
+      alert("クイズを選択してください！");
       return;
     }
 
-    const difficulty = calculateDifficulty(selectedFloorLevel); // 階層レベルをそのまま難易度に設定
+    const difficulty = calculateDifficulty(userLevel); // 階層レベルをそのまま難易度に設定
     setDifficulty(difficulty);
     setSelectedBattleQuizzes(selectedQuizzes);
+    setSelectedUserLevel(userLevel);
 
     // console.log("バトル開始:");
     // console.log("選択された階層:", selectedFloorLevel);
@@ -166,22 +155,20 @@ export default function BattleTowerSelection({
       </div>
 
       {/* 階層選択 */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">階層を選択</h2>
-        <select
-          className="w-full p-2 border rounded"
-          value={selectedFloorLevel || ""}
-          onChange={(e) => handleFloorChange(Number(e.target.value))}
-        >
-          <option value="" disabled>
-            階層を選択してください
-          </option>
-          {floorLevels.map((level) => (
-            <option key={level} value={level}>
-              {level}階（難易度: {calculateDifficulty(level)}）
-            </option>
-          ))}
-        </select>
+      <div className="flex items-center justify-between p-4 bg-gray-100 rounded shadow-sm">
+        <div>
+          <p className="text-gray-700 font-semibold">
+            選択された階層: <span className="text-blue-600">{userLevel}階</span>
+          </p>
+        </div>
+        <div>
+          <p className="text-gray-700 font-semibold">
+            難易度:{" "}
+            <span className="text-blue-600">
+              {calculateDifficulty(userLevel)}
+            </span>
+          </p>
+        </div>
       </div>
 
       {/* クイズ選択 */}

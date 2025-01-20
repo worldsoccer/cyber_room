@@ -57,7 +57,7 @@ interface BattleData {
 
 export default function BattleTower() {
   const router = useRouter();
-  const { selectedBattleQuizzes, difficulty, selectedFloorLevel } =
+  const { selectedBattleQuizzes, difficulty, selectedUserLevel } =
     useQuizContext();
 
   const [battleData, setBattleData] = useState<BattleData | null>(null);
@@ -91,7 +91,7 @@ export default function BattleTower() {
         // console.log({
         //   quizIds: selectedBattleQuizzes.map((quiz) => quiz.id),
         //   difficulty,
-        //   selectedFloorLevel,
+        //   selectedUserLevel,
         // });
 
         const response = await fetch("/api/boss/battle", {
@@ -100,7 +100,6 @@ export default function BattleTower() {
           body: JSON.stringify({
             quizIds: selectedBattleQuizzes.map((quiz) => quiz.id),
             difficulty,
-            selectedFloorLevel,
           }),
         });
 
@@ -127,7 +126,7 @@ export default function BattleTower() {
     };
 
     fetchBattleData();
-  }, [selectedBattleQuizzes, difficulty, selectedFloorLevel]);
+  }, [selectedBattleQuizzes, difficulty]);
 
   useEffect(() => {
     if (bossHp === 0 && battleData) {
@@ -299,8 +298,9 @@ export default function BattleTower() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              experienceGained:
-                difficulty! * selectedFloorLevel! * battleConfig.levelup, // 勝利時に獲得する経験値
+              experienceGained: Math.floor(
+                difficulty! * selectedUserLevel! * battleConfig.levelup
+              ), // 勝利時に獲得する経験値（小数点切り捨て）
             }),
           });
 
@@ -310,9 +310,9 @@ export default function BattleTower() {
 
           // const data = await response.json();
           alert(
-            `勝利！ 経験値 +${
-              difficulty! * selectedFloorLevel! * battleConfig.levelup
-            }`
+            `勝利！ 経験値 +${Math.floor(
+              difficulty! * selectedUserLevel! * battleConfig.levelup
+            )}`
           );
           router.push("/dashboard/battletower"); // 勝利後、ダッシュボードに戻る
         } catch (error) {
@@ -330,11 +330,9 @@ export default function BattleTower() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              experienceGained: -(
-                difficulty! *
-                selectedFloorLevel! *
-                battleConfig.leveldown
-              ), // 敗北時に失う経験値（負の値）
+              experienceGained: -Math.floor(
+                difficulty! * selectedUserLevel! * battleConfig.leveldown
+              ), // 敗北時に失う経験値（小数点切り捨て、負の値）
             }),
           });
 
@@ -343,9 +341,9 @@ export default function BattleTower() {
           }
 
           alert(
-            `敗北しました... 経験値 -${
-              difficulty! * selectedFloorLevel! * battleConfig.leveldown
-            }`
+            `敗北しました... 経験値 -${Math.floor(
+              difficulty! * selectedUserLevel! * battleConfig.leveldown
+            )}`
           );
           setUserHp(battleData?.user.maxHp || 100); // HPをリセット
           setTurnCount(1); // ターン数リセット
@@ -357,7 +355,7 @@ export default function BattleTower() {
 
       handleLoss();
     }
-  }, [gameOver, router, battleData, , difficulty, selectedFloorLevel]);
+  }, [gameOver, router, battleData, , difficulty, selectedUserLevel]);
 
   function shuffleArray<T>(array: T[]): T[] {
     const shuffled = [...array];
@@ -371,7 +369,7 @@ export default function BattleTower() {
   return (
     <div className="flex flex-col h-screen overflow-y-scroll">
       <div className="flex-shrink-0 p-4 text-center bg-gray-200">
-        <h2 className="text-xl font-semibold">フロア: {selectedFloorLevel}</h2>
+        <h2 className="text-xl font-semibold">フロア: {selectedUserLevel}</h2>
         <p>
           ボス {currentBossIndex + 1} / {battleData?.bosses.length}
         </p>

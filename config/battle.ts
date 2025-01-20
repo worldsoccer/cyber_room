@@ -1,11 +1,11 @@
 const battleConfig = {
   levelUpMultiplier: 15, // レベルアップに必要な経験値の倍率
   hpIncreasePerLevel: 1, // レベルアップごとのHP増加量
-  levelup: 2, // 勝利した時に経験値が増える倍率
-  leveldown: 2, // 敗北した時に経験値が失う倍率
+  levelup: 1.3, // 勝利した時に経験値が増える倍率
+  leveldown: 1.2, // 敗北した時に経験値が失う倍率
   minExperience: 0, // 経験値の最小値
-  attackPowerIncreasePerLevel: 1, // レベルアップごとの攻撃力増加量
-  healingPowerIncreasePerLevel: 1, // レベルアップごとの回復力増加量
+  iIncreasePerLevel: 2, // レベルアップごとの攻撃力、回復力、HP、maxHP増加量
+  levelMilestone: 5, // 特定レベルの間隔を定義
   difficultyIncrementFloor: 10, // 難易度が上がる階層の単位
   damageDivisor: 5, // プレイヤーのダメージ分母
   bossCriticalHitChance: 0.05, // クリティカルヒットの確率
