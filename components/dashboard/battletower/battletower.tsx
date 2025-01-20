@@ -148,34 +148,30 @@ export default function BattleTower() {
 
   // ボスの攻撃処理
   useEffect(() => {
-    if (gameOver || !boss) return;
+    if (gameOver || !boss || remainingBossTurns > 0) return;
 
-    if (remainingBossTurns === 0) {
-      const bossAttack = setTimeout(() => {
-        // 確率でクリティカルヒット判定
-        const isCriticalHit =
-          Math.random() < 1 / battleConfig.bossCriticalHitChance;
-        const damage = isCriticalHit
-          ? boss.attackPower * battleConfig.bossCriticalHitMultiplier
-          : boss.attackPower;
+    const bossAttack = setTimeout(() => {
+      const isCriticalHit = Math.random() < battleConfig.bossCriticalHitChance;
+      const damage = isCriticalHit
+        ? boss.attackPower * battleConfig.bossCriticalHitMultiplier
+        : boss.attackPower;
 
-        // ダメージ計算
-        setUserHp((prev) => Math.max(0, prev - damage));
+      console.log(`ボスの攻撃！ クリティカルヒット: ${isCriticalHit}`);
 
-        // Alert を setUserHp の外で実行
-        alert(
-          `ボスの攻撃！ あなたに${damage}ダメージを与えました！${
-            isCriticalHit ? " クリティカルヒット！" : ""
-          }`
-        );
+      setUserHp((prev) => Math.max(0, prev - damage));
 
-        setRemainingBossTurns(boss.attackTurn); // 次の攻撃ターン数をリセット
-        setTurnCount((prev) => prev + 1); // ターン数を更新
-      }, 1000); // 1秒遅延で攻撃
+      alert(
+        `ボスの攻撃！ あなたに${damage}ダメージを与えました！${
+          isCriticalHit ? " クリティカルヒット！" : ""
+        }`
+      );
 
-      return () => clearTimeout(bossAttack); // クリーンアップ
-    }
-  }, [remainingBossTurns, boss, gameOver]);
+      setRemainingBossTurns(boss.attackTurn);
+      setTurnCount((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearTimeout(bossAttack);
+  }, [gameOver, boss, remainingBossTurns]);
 
   // HPが0以下になったときの敗北処理
   useEffect(() => {
