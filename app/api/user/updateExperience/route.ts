@@ -2,7 +2,7 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import battleConfig from "@/config/battle"; // 設定ファイルをインポート
+import battleConfig from "@/config/battle";
 
 export async function POST(request: Request) {
   try {
@@ -35,25 +35,19 @@ export async function POST(request: Request) {
     let remainingExperience = updatedExperience;
 
     // レベルアップ処理
-    if (updatedExperience >= levelUpThreshold) {
-      while (updatedExperience >= newLevel * battleConfig.levelUpMultiplier) {
-        updatedExperience -= newLevel * battleConfig.levelUpMultiplier;
-        newLevel += 1; // レベルアップ
-      }
-      remainingExperience = updatedExperience;
+    while (remainingExperience >= newLevel * battleConfig.levelUpMultiplier) {
+      remainingExperience -= newLevel * battleConfig.levelUpMultiplier;
+      newLevel += 1; // レベルアップ
     }
 
     // レベルダウン処理
     const levelDownThreshold = (newLevel - 1) * battleConfig.levelUpMultiplier;
-    if (updatedExperience < levelDownThreshold) {
-      while (
-        newLevel > 1 &&
-        updatedExperience < (newLevel - 1) * battleConfig.levelUpMultiplier
-      ) {
-        newLevel -= 1; // レベルダウン
-        updatedExperience += newLevel * battleConfig.levelUpMultiplier;
-      }
-      remainingExperience = updatedExperience;
+    while (
+      newLevel > 1 &&
+      remainingExperience < (newLevel - 1) * battleConfig.levelUpMultiplier
+    ) {
+      newLevel -= 1; // レベルダウン
+      remainingExperience += newLevel * battleConfig.levelUpMultiplier;
     }
 
     // ユーザー情報を更新
