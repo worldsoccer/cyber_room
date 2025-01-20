@@ -156,7 +156,7 @@ export default function BattleTower() {
         ? boss.attackPower * battleConfig.bossCriticalHitMultiplier
         : boss.attackPower;
 
-      console.log(`ボスの攻撃！ クリティカルヒット: ${isCriticalHit}`);
+      // console.log(`ボスの攻撃！ クリティカルヒット: ${isCriticalHit}`);
 
       setUserHp((prev) => Math.max(0, prev - damage));
 
@@ -205,16 +205,22 @@ export default function BattleTower() {
   // クイズ選択した時の処理
   const handleAnswer = (isCorrect: boolean) => {
     if (currentQuestion && attackPower && healingPower) {
+      let newBossHp = bossHp;
+      let newUserHp = userHp;
+
       if (isCorrect) {
         if (currentQuestion.mode === "attack") {
           // クリティカルヒットの判定
           const isCriticalHit =
-            Math.random() < 1 / battleConfig.playerCriticalHitChance;
+            Math.random() < battleConfig.playerCriticalHitChance;
           const damage = isCriticalHit
             ? attackPower * battleConfig.playerCriticalHitMultiplier
             : attackPower;
 
-          setBossHp((prev) => Math.max(0, prev - damage)); // ボスにダメージ
+          newBossHp = Math.max(0, bossHp - damage); // ボスにダメージ
+          // console.log(
+          //   `正解: 攻撃モード | クリティカルヒット: ${isCriticalHit}, ダメージ: ${damage}`
+          // );
 
           alert(
             `正解！ボスに${damage}のダメージを与えました！${
@@ -224,12 +230,13 @@ export default function BattleTower() {
         } else if (currentQuestion.mode === "heal") {
           // 特別回復効果の判定
           const isSpecialHeal =
-            Math.random() < 1 / battleConfig.playerSpecialHealChance;
+            Math.random() < battleConfig.playerSpecialHealChance;
           const healAmount = isSpecialHeal
             ? healingPower * battleConfig.playerSpecialHealMultiplier
             : healingPower;
 
-          setUserHp((prev) => Math.min(maxHp!, prev + healAmount)); // HPを回復
+          newUserHp = Math.min(maxHp!, userHp + healAmount); // HPを回復
+          // console.log(`正解: 回復モード | 特別回復: ${isSpecialHeal}, 回復量: ${healAmount}`);
 
           alert(
             `正解！HPが${healAmount}回復しました！${
@@ -241,7 +248,8 @@ export default function BattleTower() {
         if (currentQuestion.mode === "attack") {
           // 不正解時のペナルティダメージ
           const damage = Math.floor(attackPower / battleConfig.damageDivisor);
-          setUserHp((prev) => Math.max(0, prev - damage)); // 自分にダメージ
+          newUserHp = Math.max(0, userHp - damage);
+
           alert(
             `不正解... あなたは失敗し、自分に${damage}のダメージを与えました。\n正解: ${
               currentQuestion.options.find((o) => o.isCorrect)?.text
@@ -256,15 +264,16 @@ export default function BattleTower() {
         }
       }
 
-      // 解説を設定
+      // 状態をまとめて更新
+      setBossHp(newBossHp);
+      setUserHp(newUserHp);
       setLastFeedback(currentQuestion.feedback?.text || null);
-      setLastAnsweredQuestion(currentQuestion); // 最後に回答した質問を保持
-
+      setLastAnsweredQuestion(currentQuestion);
       setShowImage(false);
       setCurrentQuestion(null);
       setIsAnswering(false);
-      setTurnCount((prev) => prev + 1); // ターン数を更新
-      setRemainingBossTurns((prev) => prev - 1); // ボスの攻撃ターンを減らす
+      setTurnCount((prev) => prev + 1);
+      setRemainingBossTurns((prev) => prev - 1);
     }
   };
 
