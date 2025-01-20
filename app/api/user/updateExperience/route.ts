@@ -26,15 +26,20 @@ export async function POST(request: Request) {
     }
 
     // 現在の経験値を計算
-    const updatedExperience = user.experience + experienceGained;
-
-    // レベルアップ・ダウンの判定
+    let updatedExperience = user.experience + experienceGained;
     let newLevel = user.level;
     let remainingExperience = updatedExperience;
 
+    console.log(`Initial: Experience=${updatedExperience}, Level=${newLevel}`);
+
     // レベルアップ処理
     while (remainingExperience >= newLevel * battleConfig.levelUpMultiplier) {
-      remainingExperience -= newLevel * battleConfig.levelUpMultiplier;
+      const levelThreshold = newLevel * battleConfig.levelUpMultiplier;
+      console.log(
+        `Level Up: CurrentExp=${remainingExperience}, Threshold=${levelThreshold}`
+      );
+
+      remainingExperience -= levelThreshold;
       newLevel += 1; // レベルアップ
     }
 
@@ -43,8 +48,14 @@ export async function POST(request: Request) {
       newLevel > 1 &&
       remainingExperience < (newLevel - 1) * battleConfig.levelUpMultiplier
     ) {
+      const levelDownThreshold =
+        (newLevel - 1) * battleConfig.levelUpMultiplier;
+      console.log(
+        `Level Down: CurrentExp=${remainingExperience}, Threshold=${levelDownThreshold}`
+      );
+
       newLevel -= 1; // レベルダウン
-      remainingExperience += newLevel * battleConfig.levelUpMultiplier;
+      remainingExperience += levelDownThreshold;
     }
 
     // ユーザー情報を更新
@@ -67,6 +78,8 @@ export async function POST(request: Request) {
           (newLevel - user.level) * battleConfig.healingPowerIncreasePerLevel,
       },
     });
+
+    console.log(`Final: Experience=${remainingExperience}, Level=${newLevel}`);
 
     return NextResponse.json({ success: true, user: updatedUser });
   } catch (error) {
