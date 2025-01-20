@@ -68,6 +68,13 @@ export async function POST(request: Request) {
     //   newLevel
     // );
 
+    // レベル差分を計算
+    const levelDifference = newLevel - user.level;
+
+    // 特定レベルごとに+2の増加分を計算
+    const additionalMultiplier =
+      Math.floor(newLevel / 10) - Math.floor(user.level / 10); // 10ごとの増加回数
+
     // ユーザー情報を更新
     const updatedUser = await db.user.update({
       where: { id: userId },
@@ -75,17 +82,21 @@ export async function POST(request: Request) {
         experience: totalExperience,
         level: newLevel,
         hp:
-          user.maxHp +
-          (newLevel - user.level) * battleConfig.hpIncreasePerLevel,
+          user.hp +
+          levelDifference * battleConfig.hpIncreasePerLevel +
+          additionalMultiplier * 2, // 10ごとに+2
         maxHp:
           user.maxHp +
-          (newLevel - user.level) * battleConfig.hpIncreasePerLevel,
+          levelDifference * battleConfig.hpIncreasePerLevel +
+          additionalMultiplier * 2, // 10ごとに+2
         attackPower:
           user.attackPower +
-          (newLevel - user.level) * battleConfig.attackPowerIncreasePerLevel,
+          levelDifference * battleConfig.attackPowerIncreasePerLevel +
+          additionalMultiplier * 2, // 10ごとに+2
         healingPower:
           user.healingPower +
-          (newLevel - user.level) * battleConfig.healingPowerIncreasePerLevel,
+          levelDifference * battleConfig.healingPowerIncreasePerLevel +
+          additionalMultiplier * 2, // 10ごとに+2
       },
     });
 
