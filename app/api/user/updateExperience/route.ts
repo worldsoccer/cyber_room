@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     }
 
     // 現在の経験値を計算
-    let updatedExperience = user.experience + experienceGained;
+    const updatedExperience = user.experience + experienceGained;
     let newLevel = user.level;
     let remainingExperience = updatedExperience;
 
