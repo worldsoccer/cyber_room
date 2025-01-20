@@ -25,40 +25,54 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // 現在の経験値を計算
-    let updatedExperience = user.experience + experienceGained;
+    // 初期化
+    let totalExperience = user.experience + experienceGained; // 現在の経験値 + 獲得経験値
     let newLevel = user.level;
 
-    // 経験値が0未満にならないよう制御
-    if (updatedExperience < 0) {
-      updatedExperience = 0;
+    // console.log(
+    //   "Initial: TotalExperience=",
+    //   totalExperience,
+    //   "Level=",
+    //   newLevel
+    // );
+
+    if (experienceGained > 0) {
+      // レベルアップ処理
+      while (totalExperience >= newLevel * battleConfig.levelUpMultiplier) {
+        const levelThreshold = newLevel * battleConfig.levelUpMultiplier;
+        totalExperience -= levelThreshold; // 必要経験値を差し引く
+        newLevel += 1; // レベルアップ
+        // console.log(
+        //   `Level Up! New Level: ${newLevel}, Remaining Experience: ${totalExperience}`
+        // );
+      }
+    } else if (experienceGained < 0) {
+      // レベルダウン処理
+      while (
+        newLevel > 1 &&
+        totalExperience < (newLevel - 1) * battleConfig.levelUpMultiplier
+      ) {
+        newLevel -= 1; // レベルダウン
+        const levelThreshold = newLevel * battleConfig.levelUpMultiplier;
+        totalExperience += levelThreshold; // 必要経験値を繰り戻す
+        // console.log(
+        //   `Level Down! New Level: ${newLevel}, Remaining Experience: ${totalExperience}`
+        // );
+      }
     }
 
-    let remainingExperience = updatedExperience;
-
-    // レベルアップ処理
-    while (remainingExperience >= newLevel * battleConfig.levelUpMultiplier) {
-      remainingExperience -= newLevel * battleConfig.levelUpMultiplier;
-      newLevel += 1;
-    }
-
-    // レベルダウン処理
-    while (
-      newLevel > 1 &&
-      remainingExperience < (newLevel - 1) * battleConfig.levelUpMultiplier
-    ) {
-      const levelDownThreshold =
-        (newLevel - 1) * battleConfig.levelUpMultiplier;
-
-      newLevel -= 1; // レベルダウン
-      remainingExperience += levelDownThreshold;
-    }
+    // console.log(
+    //   "Final: RemainingExperience=",
+    //   totalExperience,
+    //   "Level=",
+    //   newLevel
+    // );
 
     // ユーザー情報を更新
     const updatedUser = await db.user.update({
       where: { id: userId },
       data: {
-        experience: remainingExperience,
+        experience: totalExperience,
         level: newLevel,
         hp:
           user.maxHp +
@@ -74,8 +88,6 @@ export async function POST(request: Request) {
           (newLevel - user.level) * battleConfig.healingPowerIncreasePerLevel,
       },
     });
-
-    console.log(`Final: Experience=${remainingExperience}, Level=${newLevel}`);
 
     return NextResponse.json({ success: true, user: updatedUser });
   } catch (error) {

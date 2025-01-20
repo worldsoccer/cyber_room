@@ -208,17 +208,26 @@ export default function BattleTowerSelection({
         {selectedFolderId && (
           <div className="space-y-2">
             <h3 className="font-semibold">ファイルを選択</h3>
-            <ul className="list-none">
+            <ul className="list-none space-y-2">
               {folders
                 .find((folder) => folder.id === selectedFolderId)
                 ?.files.map((file) => (
                   <li key={file.id} className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedFileIds.includes(file.id)}
-                      onChange={() => handleFileToggle(file.id)}
-                    />
-                    <label>{file.name}</label>
+                    <label
+                      className="flex items-center space-x-2 cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleFileToggle(file.id);
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedFileIds.includes(file.id)}
+                        onChange={() => handleFileToggle(file.id)}
+                        className="cursor-pointer"
+                      />
+                      <span className="cursor-pointer">{file.name}</span>
+                    </label>
                   </li>
                 ))}
             </ul>
@@ -246,7 +255,7 @@ export default function BattleTowerSelection({
             >
               クイズ選択解除
             </button>
-            <ul className="list-disc ml-5">
+            <ul className="list-none ml-5 space-y-2">
               {folders
                 .flatMap((folder) => folder.files)
                 .filter((file) => selectedFileIds.includes(file.id))
