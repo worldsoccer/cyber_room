@@ -26,9 +26,7 @@ export async function POST(request: Request) {
     }
 
     // 現在の経験値を計算
-    let updatedExperience = user.experience + experienceGained;
-
-    const levelUpThreshold = user.level * battleConfig.levelUpMultiplier; // レベルアップに必要な経験値
+    const updatedExperience = user.experience + experienceGained;
 
     // レベルアップ・ダウンの判定
     let newLevel = user.level;
@@ -41,7 +39,6 @@ export async function POST(request: Request) {
     }
 
     // レベルダウン処理
-    const levelDownThreshold = (newLevel - 1) * battleConfig.levelUpMultiplier;
     while (
       newLevel > 1 &&
       remainingExperience < (newLevel - 1) * battleConfig.levelUpMultiplier
