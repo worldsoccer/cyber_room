@@ -41,8 +41,9 @@ export default function BattleTowerSelection({
   const remainingExp = nextLevelExp - userExperience;
 
   // 階層に基づいて難易度を計算
-  const calculateDifficulty = (floorLevel: number) => {
-    return Math.ceil(floorLevel / battleConfig.difficultyIncrementFloor) + 1; // 10階ごとに難易度が1ずつ増加
+  const calculateDifficulty = (floorLevel: number): number => {
+    const { difficultyIncrementFloor } = battleConfig;
+    return Math.ceil(floorLevel / difficultyIncrementFloor);
   };
 
   // フォルダ選択処理
